@@ -1,30 +1,9 @@
-﻿  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\2DPolygon_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Burn_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Copy_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Distort_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\2DQuad_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\GreyNoise_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\HeatHaze_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Spiral_pp.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\TintedTexture_ps.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\BasicTransform_vs.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\PixelLighting_ps.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\PixelLighting_vs.cso
-  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Tint_pp.cso
-  Camera.cpp
-  Direct3DSetup.cpp
-  Main.cpp
-  CMatrix4x4.cpp
-  CVector2.cpp
-  CVector3.cpp
-  CVector4.cpp
-  Model.cpp
-  Scene.cpp
-  Shader.cpp
-  Mesh.cpp
-  State.cpp
-  Input.cpp
-  GraphicsHelpers.cpp
-  Timer.cpp
-  Generating Code...
+﻿C:\Users\aiden\Documents\GitHub\Math-TechAss\BlurSecond_pp.hlsl(29,12-85): warning X3206: implicit truncation of vector type
+  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\BlurSecond_pp.cso
+C:\Users\aiden\Documents\GitHub\Math-TechAss\BlurSecond_pp.hlsl(36,9): warning X3206: implicit truncation of vector type
+  
+C:\Users\aiden\Documents\GitHub\Math-TechAss\Blur_pp.hlsl(29,12-85): warning X3206: implicit truncation of vector type
+C:\Users\aiden\Documents\GitHub\Math-TechAss\Blur_pp.hlsl(36,9): warning X3206: implicit truncation of vector type
+  
+  compilation object save succeeded; see C:\Users\aiden\Documents\GitHub\Math-TechAss\Blur_pp.cso
   PostProcessingArea.vcxproj -> C:\Users\aiden\Documents\GitHub\Math-TechAss\\PostProcessingArea.exe

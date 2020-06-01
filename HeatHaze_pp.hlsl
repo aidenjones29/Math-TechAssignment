@@ -40,8 +40,10 @@ float4 main(PostProcessingInput input) : SV_Target
 	// Adjust size of UV offset based on the constant EffectStrength, the overall size of area being processed, and the alpha value calculated above
 	float2 hazeOffset = float2(SinY, SinX) * effectStrength * alpha * gArea2DSize;
 
+    float3 colour2 = { 0, 4, 4};
+
 	// Get pixel from scene texture, offset using haze
-    float3 colour = SceneTexture.Sample(PointSample, input.sceneUV + hazeOffset).rgb;
+    float3 colour = SceneTexture.Sample(PointSample, input.sceneUV + hazeOffset).rgb * colour2;
 
 	// Adjust alpha on a sine wave - because it's better to have it nearer to 1.0 (but don't allow it to exceed 1.0)
     alpha *= saturate(SinX * SinY * 0.33f + 0.66f);

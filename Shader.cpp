@@ -34,6 +34,8 @@ ID3D11PixelShader*  gBurnPostProcess       = nullptr;
 ID3D11PixelShader*  gDistortPostProcess    = nullptr;
 ID3D11PixelShader*  gSpiralPostProcess     = nullptr;
 ID3D11PixelShader*  gHeatHazePostProcess   = nullptr;
+ID3D11PixelShader*  gBlurPostProcess       = nullptr;
+ID3D11PixelShader*  gBlurSecondPostProcess = nullptr;
 
 
 
@@ -64,6 +66,8 @@ bool LoadShaders()
 	gDistortPostProcess    = LoadPixelShader ("Distort_pp");
 	gSpiralPostProcess     = LoadPixelShader ("Spiral_pp");
 	gHeatHazePostProcess   = LoadPixelShader ("HeatHaze_pp");
+	gBlurPostProcess       = LoadPixelShader ("Blur_pp");
+	gBlurSecondPostProcess = LoadPixelShader ("BlurSecond_pp");
 
 	if (gBasicTransformVertexShader == nullptr || gPixelLightingVertexShader == nullptr ||
 		gTintedTexturePixelShader   == nullptr || gPixelLightingPixelShader  == nullptr ||
@@ -71,7 +75,8 @@ bool LoadShaders()
 		gTintPostProcess            == nullptr || gHeatHazePostProcess       == nullptr ||
 		gGreyNoisePostProcess       == nullptr || gBurnPostProcess           == nullptr ||
 		gDistortPostProcess         == nullptr || gSpiralPostProcess         == nullptr ||
-		g2DPolygonVertexShader      == nullptr)
+		g2DPolygonVertexShader      == nullptr || gBlurPostProcess           == nullptr ||
+		gBlurSecondPostProcess      == nullptr)
 	{
 		gLastError = "Error loading shaders";
 		return false;
@@ -89,6 +94,8 @@ void ReleaseShaders()
 	if (gBurnPostProcess)             gBurnPostProcess           ->Release();
 	if (gGreyNoisePostProcess)        gGreyNoisePostProcess      ->Release();
 	if (gTintPostProcess)             gTintPostProcess           ->Release();
+	if (gBlurPostProcess)             gBlurPostProcess           ->Release();
+	if (gBlurSecondPostProcess)       gBlurSecondPostProcess     ->Release();
 	if (gCopyPostProcess)             gCopyPostProcess           ->Release();
 	if (g2DPolygonVertexShader)       g2DPolygonVertexShader     ->Release();
 	if (g2DQuadVertexShader)          g2DQuadVertexShader        ->Release();
