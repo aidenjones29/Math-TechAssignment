@@ -965,6 +965,7 @@ void UpdateScene(float frameTime)
 	// Update heat haze timer
 	gPostProcessingConstants.heatHazeTimer += frameTime;
 
+	gPostProcessingConstants.tintColourTime += frameTime;
 	//***********
 
 

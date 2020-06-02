@@ -152,6 +152,9 @@ cbuffer PostProcessingConstants : register(b1)
 	// Heat haze post-process settings
 	float  gHeatHazeTimer;
 	float3 paddingF;
+    
+    float tintColourTime;
+    float3 paddingG;
 }
 
 //**************************
