@@ -51,8 +51,17 @@ enum class PostProcessMode
 	Polygon,
 };
 
+struct WallProcess
+{
+	PostProcess WallPP;
+	CMatrix4x4 polyWallMatrix;
+};
+
 auto gCurrentPostProcess     = PostProcess::None;
 std::vector<PostProcess> gVecCurrentPostProcess;
+std::vector<WallProcess> gWallPostProcesses;
+const std::array<CVector3, 4> points = { {{5,-5,0}, {5,5,0}, {-5,-5,0}, {-5,5,0}} };
+
 auto gCurrentPostProcessMode = PostProcessMode::Fullscreen;
 
 //********************
@@ -72,11 +81,15 @@ Mesh* gGroundMesh;
 Mesh* gCubeMesh;
 Mesh* gCrateMesh;
 Mesh* gLightMesh;
+Mesh* gWallOneMesh;
+Mesh* gWallTwoMesh;
 
 Model* gStars;
 Model* gGround;
 Model* gCube;
 Model* gCrate;
+Model* gWallOne;
+Model* gWallTwo;
 
 Camera* gCamera;
 
@@ -137,6 +150,8 @@ ID3D11Resource*           gCrateDiffuseSpecularMap = nullptr;
 ID3D11ShaderResourceView* gCrateDiffuseSpecularMapSRV = nullptr;
 ID3D11Resource*           gCubeDiffuseSpecularMap = nullptr;
 ID3D11ShaderResourceView* gCubeDiffuseSpecularMapSRV = nullptr;
+ID3D11Resource*           gWallDiffuseSpecularMap = nullptr;
+ID3D11ShaderResourceView* gWallDiffuseSpecularMapSRV = nullptr;
 
 ID3D11Resource*           gLightDiffuseMap = nullptr;
 ID3D11ShaderResourceView* gLightDiffuseMapSRV = nullptr;
@@ -198,6 +213,8 @@ bool InitGeometry()
 		gCubeMesh   = new Mesh("Cube.x");
 		gCrateMesh  = new Mesh("CargoContainer.x");
 		gLightMesh  = new Mesh("Light.x");
+		gWallOneMesh= new Mesh("Wall1.x");
+		gWallTwoMesh= new Mesh("Wall2.x");
 	}
 	catch (std::runtime_error e)  // Constructors cannot return error messages so use exceptions to catch mesh errors (fairly standard approach this)
 	{
@@ -215,6 +232,7 @@ bool InitGeometry()
 	if (!LoadTexture("Stars.jpg",                &gStarsDiffuseSpecularMap,  &gStarsDiffuseSpecularMapSRV) ||
 		!LoadTexture("GrassDiffuseSpecular.dds", &gGroundDiffuseSpecularMap, &gGroundDiffuseSpecularMapSRV) ||
 		!LoadTexture("StoneDiffuseSpecular.dds", &gCubeDiffuseSpecularMap,   &gCubeDiffuseSpecularMapSRV) ||
+		!LoadTexture("brick_35.jpg",             &gWallDiffuseSpecularMap,   &gWallDiffuseSpecularMapSRV) ||
 		!LoadTexture("CargoA.dds",               &gCrateDiffuseSpecularMap,  &gCrateDiffuseSpecularMapSRV) ||
 		!LoadTexture("Flare.jpg",                &gLightDiffuseMap,          &gLightDiffuseMapSRV) ||
 		!LoadTexture("Noise.png",                &gNoiseMap,   &gNoiseMapSRV) ||
@@ -332,6 +350,8 @@ bool InitScene()
 	gGround = new Model(gGroundMesh);
 	gCube   = new Model(gCubeMesh);
 	gCrate  = new Model(gCrateMesh);
+	gWallOne= new Model(gWallOneMesh);
+	gWallTwo= new Model(gWallTwoMesh);
 
 	// Initial positions
 	gCube->SetPosition({ 42, 5, -10 });
@@ -341,6 +361,10 @@ bool InitScene()
 	gCrate->SetRotation({ 0.0f, ToRadians(40.0f), 0.0f });
 	gCrate->SetScale(6.0f);
 	gStars->SetScale(8000.0f);
+	gWallOne->SetScale(50);
+	gWallOne->SetPosition({ 50, 0, 80 });
+	gWallTwo->SetScale(50);
+	gWallTwo->SetPosition({ 50, 0, 30 });
 
 
 	// Light set-up - using an array this time
@@ -348,6 +372,16 @@ bool InitScene()
 	{
 		gLights[i].model = new Model(gLightMesh);
 	}
+
+	WallProcess Wall1PP = {PostProcess::Tint,MatrixTranslation({ 20, 20, 0 }) };
+	WallProcess Wall2PP = { PostProcess::Blur,MatrixTranslation({ 50, 20, 0 }) };;
+	WallProcess Wall3PP = { PostProcess::Distort,MatrixTranslation({ 40, 20, 0 }) };;
+	WallProcess Wall4PP = { PostProcess::HeatHaze,MatrixTranslation({ 30, 20, 0 }) };;
+
+	gWallPostProcesses.push_back(Wall1PP);
+	gWallPostProcesses.push_back(Wall2PP);
+	gWallPostProcesses.push_back(Wall3PP);
+	gWallPostProcesses.push_back(Wall4PP);
 
 	gLights[0].colour = { 0.8f, 0.8f, 1.0f };
 	gLights[0].strength = 10;
@@ -396,6 +430,10 @@ void ReleaseResources()
 	if (gCrateDiffuseSpecularMap)      gCrateDiffuseSpecularMap->Release();
 	if (gCubeDiffuseSpecularMapSRV)    gCubeDiffuseSpecularMapSRV->Release();
 	if (gCubeDiffuseSpecularMap)       gCubeDiffuseSpecularMap->Release();
+
+	if (gWallDiffuseSpecularMap)       gWallDiffuseSpecularMap->Release();
+	if (gWallDiffuseSpecularMapSRV)    gWallDiffuseSpecularMapSRV->Release();
+
 	if (gGroundDiffuseSpecularMapSRV)  gGroundDiffuseSpecularMapSRV->Release();
 	if (gGroundDiffuseSpecularMap)     gGroundDiffuseSpecularMap->Release();
 	if (gStarsDiffuseSpecularMapSRV)   gStarsDiffuseSpecularMapSRV->Release();
@@ -415,14 +453,19 @@ void ReleaseResources()
 	delete gCamera;  gCamera = nullptr;
 	delete gCrate;   gCrate = nullptr;
 	delete gCube;    gCube = nullptr;
+	delete gWallOne;    gWallOne = nullptr;
+	delete gWallTwo;    gWallTwo = nullptr;
 	delete gGround;  gGround = nullptr;
 	delete gStars;   gStars = nullptr;
 
 	delete gLightMesh;   gLightMesh = nullptr;
 	delete gCrateMesh;   gCrateMesh = nullptr;
 	delete gCubeMesh;    gCubeMesh = nullptr;
+	delete gWallOneMesh; gWallOneMesh = nullptr;
+	delete gWallTwoMesh; gWallTwoMesh = nullptr;
 	delete gGroundMesh;  gGroundMesh = nullptr;
 	delete gStarsMesh;   gStarsMesh = nullptr;
+	delete gWallOneMesh; gWallOneMesh = nullptr;
 }
 
 
@@ -472,6 +515,12 @@ void RenderSceneFromCamera(Camera* camera)
 
 	gD3DContext->PSSetShaderResources(0, 1, &gCubeDiffuseSpecularMapSRV); // First parameter must match texture slot number in the shader
 	gCube->Render();
+
+	gD3DContext->PSSetShaderResources(0, 1, &gWallDiffuseSpecularMapSRV); // First parameter must match texture slot number in the shader
+	gWallOne->Render();
+
+	gD3DContext->PSSetShaderResources(0, 1, &gWallDiffuseSpecularMapSRV); // First parameter must match texture slot number in the shader
+	gWallTwo->Render();
 
 
 	////--------------- Render sky ---------------////
@@ -854,6 +903,14 @@ void RenderScene()
 
 	////--------------- Scene completion ---------------////
 
+	if (gWallPostProcesses.size() != 0)
+	{
+		for (int i = 0; i < gWallPostProcesses.size(); i++)
+		{
+			PolygonPostProcess(gWallPostProcesses[i].WallPP, points, gWallPostProcesses[i].polyWallMatrix, i);
+		}
+	}
+	WAAAAAAAAAAA
 	// Run any post-processing steps
 	if (gVecCurrentPostProcess.size() != 0)
 	{
@@ -877,7 +934,7 @@ void RenderScene()
 		else if (gCurrentPostProcessMode == PostProcessMode::Polygon)
 		{
 			// An array of four points in world space - a tapered square centred at the origin
-			const std::array<CVector3, 4> points = {{{5,-5,0}, {5,5,0}, {-5,-5,0}, {-5,5,0}}}; // C++ strangely needs an extra pair of {} here... only for std:array...
+			//const std::array<CVector3, 4> points = {{{5,-5,0}, {5,5,0}, {-5,-5,0}, {-5,5,0}}}; // C++ strangely needs an extra pair of {} here... only for std:array...
 
 			// A rotating matrix placing the model above in the scene
 			static CMatrix4x4 polyMatrix = MatrixTranslation({ 20, 15, 0 });
