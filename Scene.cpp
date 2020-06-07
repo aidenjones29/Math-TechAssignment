@@ -903,17 +903,22 @@ void RenderScene()
 
 	////--------------- Scene completion ---------------////
 
-	if (gWallPostProcesses.size() != 0)
+	//if (gWallPostProcesses.size() != 0)
+	//{
+	//	for (int i = 0; i < gWallPostProcesses.size(); i++)
+	//	{
+	//		PolygonPostProcess(gWallPostProcesses[i].WallPP, points, gWallPostProcesses[i].polyWallMatrix, i);
+	//	}
+	//}
+
+	// Run any post-processing steps
+	if (gVecCurrentPostProcess.size() != 0)
 	{
 		for (int i = 0; i < gWallPostProcesses.size(); i++)
 		{
 			PolygonPostProcess(gWallPostProcesses[i].WallPP, points, gWallPostProcesses[i].polyWallMatrix, i);
 		}
-	}
-	WAAAAAAAAAAA
-	// Run any post-processing steps
-	if (gVecCurrentPostProcess.size() != 0)
-	{
+
 		if (gCurrentPostProcessMode == PostProcessMode::Fullscreen)
 		{
 			for (int i = 0; i < gVecCurrentPostProcess.size(); i++)
