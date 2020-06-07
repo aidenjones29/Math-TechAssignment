@@ -1,2 +1,5 @@
 ﻿  Scene.cpp
+C:\Users\aiden\Documents\GitHub\Math-TechAss\Scene.cpp(924,83): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\aiden\Documents\GitHub\Math-TechAss\Scene.cpp(933,119): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\aiden\Documents\GitHub\Math-TechAss\Scene.cpp(947,100): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   PostProcessingArea.vcxproj -> C:\Users\aiden\Documents\GitHub\Math-TechAss\\PostProcessingArea.exe

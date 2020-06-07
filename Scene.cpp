@@ -60,7 +60,7 @@ struct WallProcess
 auto gCurrentPostProcess     = PostProcess::None;
 std::vector<PostProcess> gVecCurrentPostProcess;
 std::vector<WallProcess> gWallPostProcesses;
-const std::array<CVector3, 4> points = { {{5,-5,0}, {5,5,0}, {-5,-5,0}, {-5,5,0}} };
+const std::array<CVector3, 4> points = { {{7,-7,0}, {7,7,0}, {-7,-7,0}, {-7,7,0}} };
 
 auto gCurrentPostProcessMode = PostProcessMode::Fullscreen;
 
@@ -373,15 +373,17 @@ bool InitScene()
 		gLights[i].model = new Model(gLightMesh);
 	}
 
-	WallProcess Wall1PP = {PostProcess::Tint,MatrixTranslation({ 20, 20, 0 }) };
-	WallProcess Wall2PP = { PostProcess::Blur,MatrixTranslation({ 50, 20, 0 }) };;
-	WallProcess Wall3PP = { PostProcess::Distort,MatrixTranslation({ 40, 20, 0 }) };;
-	WallProcess Wall4PP = { PostProcess::HeatHaze,MatrixTranslation({ 30, 20, 0 }) };;
+	WallProcess Wall1PP = { PostProcess::Tint,      MatrixTranslation({ 28, 13, 30 }) };
+	WallProcess Wall2PP = { PostProcess::Blur,      MatrixTranslation({ 73, 13, 30 }) };
+	WallProcess Wall3PP = { PostProcess::BlurSecond,MatrixTranslation({ 73, 13, 30 }) };
+	WallProcess Wall4PP = { PostProcess::HeatHaze,  MatrixTranslation({ 57, 13, 30 }) };
+	WallProcess Wall5PP = { PostProcess::Distort,   MatrixTranslation({ 40, 13, 30 }) };
 
 	gWallPostProcesses.push_back(Wall1PP);
 	gWallPostProcesses.push_back(Wall2PP);
 	gWallPostProcesses.push_back(Wall3PP);
 	gWallPostProcesses.push_back(Wall4PP);
+	gWallPostProcesses.push_back(Wall5PP);
 
 	gLights[0].colour = { 0.8f, 0.8f, 1.0f };
 	gLights[0].strength = 10;
@@ -875,7 +877,8 @@ void RenderScene()
 	// Set the target for rendering and select the main depth buffer.
 	// If using post-processing then render to the scene texture, otherwise to the usual back buffer
 	// Also clear the render target to a fixed colour and the depth buffer to the far distance
-	if (gVecCurrentPostProcess.size() != 0)
+
+	if (gVecCurrentPostProcess.size() != 0 || gWallPostProcesses.size() != 0)
 	{
 		gD3DContext->OMSetRenderTargets(1, &gSceneRenderTarget1, gDepthStencil);
 		gD3DContext->ClearRenderTargetView(gSceneRenderTarget1, &gBackgroundColor.r);
@@ -903,27 +906,22 @@ void RenderScene()
 
 	////--------------- Scene completion ---------------////
 
-	//if (gWallPostProcesses.size() != 0)
-	//{
-	//	for (int i = 0; i < gWallPostProcesses.size(); i++)
-	//	{
-	//		PolygonPostProcess(gWallPostProcesses[i].WallPP, points, gWallPostProcesses[i].polyWallMatrix, i);
-	//	}
-	//}
-
-	// Run any post-processing steps
-	if (gVecCurrentPostProcess.size() != 0)
+	if (gWallPostProcesses.size() != 0)
 	{
 		for (int i = 0; i < gWallPostProcesses.size(); i++)
 		{
 			PolygonPostProcess(gWallPostProcesses[i].WallPP, points, gWallPostProcesses[i].polyWallMatrix, i);
 		}
+	}
 
+	// Run any post-processing steps
+	if (gVecCurrentPostProcess.size() != 0)
+	{
 		if (gCurrentPostProcessMode == PostProcessMode::Fullscreen)
 		{
 			for (int i = 0; i < gVecCurrentPostProcess.size(); i++)
 			{
-				FullScreenPostProcess(gVecCurrentPostProcess[i], i);
+				FullScreenPostProcess(gVecCurrentPostProcess[i], i + gWallPostProcesses.size());
 			}
 		}
 
@@ -932,15 +930,13 @@ void RenderScene()
 			for (int i = 0; i < gVecCurrentPostProcess.size(); i++)
 			{
 				// Pass a 3D point for the centre of the affected area and the size of the (rectangular) area in world units
-				AreaPostProcess(gVecCurrentPostProcess[i], gLights[0].model->Position(), { 20, 20 }, i);
+				AreaPostProcess(gVecCurrentPostProcess[i], gLights[0].model->Position(), { 20, 20 }, i + gWallPostProcesses.size());
 			}
 		}
 
 		else if (gCurrentPostProcessMode == PostProcessMode::Polygon)
 		{
 			// An array of four points in world space - a tapered square centred at the origin
-			//const std::array<CVector3, 4> points = {{{5,-5,0}, {5,5,0}, {-5,-5,0}, {-5,5,0}}}; // C++ strangely needs an extra pair of {} here... only for std:array...
-
 			// A rotating matrix placing the model above in the scene
 			static CMatrix4x4 polyMatrix = MatrixTranslation({ 20, 15, 0 });
 			polyMatrix = MatrixRotationY(ToRadians(1)) * polyMatrix;
@@ -948,7 +944,7 @@ void RenderScene()
 			for (int i = 0; i < gVecCurrentPostProcess.size(); i++)
 			{
 				// Pass an array of 4 points and a matrix. Only supports 4 points.
-				PolygonPostProcess(gVecCurrentPostProcess[i], points, polyMatrix, i);
+				PolygonPostProcess(gVecCurrentPostProcess[i], points, polyMatrix, i + gWallPostProcesses.size());
 			}
 
 		}
